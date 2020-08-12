@@ -18,8 +18,8 @@ app.set('view engine', 'ejs');
 
 
 // middleware & static files
-app.use(express.static('public'))
-
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 
@@ -28,11 +28,6 @@ app.get('/', (req, res) => {
     res.redirect('/blogs');
 });
 
-app.get('/single-blog', (req, res) => {
-    Blog.findById('5f337b1813ebf43030d15bee')
-        .then(result => res.send(result))
-        .catch(err => console.log(err));
-});
 
 
 
@@ -55,8 +50,15 @@ app.get('/blogs', (req, res) => {
         .catch(err => console.log(err))
 });
 
+app.post('/blogs', (req, res) => {
+    const blog = new Blog(req.body);
+    blog.save()
+        .then(result => res.redirect('/blogs'))
+        .catch(err => console.log(err));
+})
+
 app.get('/blogs/create', (req, res) => {
-    res.render('create', { title: 'Create a new Blolg'});
+    res.render('create', { title: 'Create a new Blog'});
 })
 
 // 404 page
