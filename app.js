@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const Blog = require('./models/blog');
 
 // express app
 const app = express();
@@ -21,6 +22,27 @@ app.use(express.static('public'))
 
 app.use(morgan('dev'));
 
+// mongoose and mongo snadbox routes
+app.get('/add-blog', (req, res) => {
+    const blog = new Blog({
+        title: 'new blog 2',
+        snippet: 'about my new blog',
+        body: 'more about my new blog'
+    });
+    blog.save()
+        .then(result => {
+            res.send(result)
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+app.get('/all-blogs', (req, res) => {
+    Blog.find()
+        .then(result => res.send(result))
+        .catch(err => console.log(err));
+})
 
 app.get('/', (req, res) => {
     const blogs = [
@@ -29,6 +51,12 @@ app.get('/', (req, res) => {
         {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
       ];
     res.render('index', { title: 'Home', blogs });
+});
+
+app.get('/single-blog', (req, res) => {
+    Blog.findById('5f337b1813ebf43030d15bee')
+        .then(result => res.send(result))
+        .catch(err => console.log(err));
 });
 
 
