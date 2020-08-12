@@ -22,35 +22,10 @@ app.use(express.static('public'))
 
 app.use(morgan('dev'));
 
-// mongoose and mongo snadbox routes
-app.get('/add-blog', (req, res) => {
-    const blog = new Blog({
-        title: 'new blog 2',
-        snippet: 'about my new blog',
-        body: 'more about my new blog'
-    });
-    blog.save()
-        .then(result => {
-            res.send(result)
-        })
-        .catch(err => {
-            console.log(err)
-        });
-});
 
-app.get('/all-blogs', (req, res) => {
-    Blog.find()
-        .then(result => res.send(result))
-        .catch(err => console.log(err));
-})
-
+// routes
 app.get('/', (req, res) => {
-    const blogs = [
-        {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      ];
-    res.render('index', { title: 'Home', blogs });
+    res.redirect('/blogs');
 });
 
 app.get('/single-blog', (req, res) => {
@@ -69,6 +44,15 @@ app.get('/about', (req, res) => {
 // redirects
 app.get('/about-us', (req, res) => {
     res.redirect('/about', { title: 'about'});
+});
+
+// blog routes
+app.get('/blogs', (req, res) => {
+    Blog.find().sort({ createdAt: -1 })
+        .then(result => {
+            res.render('index', { title: 'All Blogs', blogs: result })
+        })
+        .catch(err => console.log(err))
 });
 
 app.get('/blogs/create', (req, res) => {
